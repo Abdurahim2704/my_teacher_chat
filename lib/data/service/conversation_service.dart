@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/widgets.dart';
 import 'package:my_teacher_chat/data/service/token_manager.dart';
 
@@ -29,27 +28,26 @@ class ConversationService {
 
   Future<DataSource> createConversation(
       String chatId, String studentId, String title) async {
-    try {
-      print("Salom");
-      const url = "$baseUrl/api/conversation";
-      final result = await manager.dio.post(url,
-          data: jsonEncode({
-            "chat": chatId,
-            "student": studentId,
-            "title": title,
-          }),
-          options: Options(headers: {
-            "content-type": "application/json",
-          }));
-      print("Result: ${result.data}");
-      if (result.statusCode != 201) {
-        return DataFailure(
-            message: "Error: ${jsonDecode(result.data)['message']}");
-      }
-      return DataSuccess(data: result.data, message: "Success");
-    } catch (e) {
-      return DataFailure(message: "Error: ${e.toString()}");
+    print("Salom");
+    const url = "$baseUrl/api/conversation";
+    final data = jsonEncode(
+      {
+        "chat": chatId,
+        "student": studentId,
+        "title": title,
+      },
+    );
+    print("1");
+    final result = await manager.dio.post(
+      url,
+      data: data,
+    );
+    print("Result: ${result.data}");
+    if (result.statusCode != 201) {
+      return DataFailure(
+          message: "Error: ${jsonDecode(result.data)['message']}");
     }
+    return DataSuccess(data: result.data, message: "Success");
   }
 }
 

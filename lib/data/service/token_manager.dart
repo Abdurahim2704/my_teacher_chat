@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenManager {
-  final dio = Dio();
+  final dio = Dio(BaseOptions(
+      connectTimeout: const Duration(minutes: 2),
+      receiveTimeout: const Duration(minutes: 2)));
   String? accessToken;
 
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
@@ -12,7 +13,8 @@ class TokenManager {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         options.headers["Authorization"] = "Bearer $accessToken";
-        options.validateStatus = (status) => status == 200;
+        options.headers["Content-Type"] = "application/json";
+        options.headers["Accept"] = "application/json";
         return handler.next(options);
       },
       onError: (error, handler) async {
@@ -51,7 +53,7 @@ class TokenManager {
     final myOptions = Options(
         method: options.method,
         headers: options.headers,
-        validateStatus: (status) => status == 200,
+        validateStatus: (status) => (status == 200 || status == 201),
         responseType: ResponseType.json);
     final response = await dio.request<dynamic>(options.path,
         data: options.data,
